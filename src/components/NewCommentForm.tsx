@@ -16,6 +16,7 @@ export const NewCommentForm: React.FC<Props> = ({ postId, onCommentAdded }) => {
   const [errors, setErrors] = useState({ name: '', email: '', body: '' });
   const [error, setError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
   const validate = () => {
     const newErrors = { name: '', email: '', body: '' };
@@ -42,7 +43,13 @@ export const NewCommentForm: React.FC<Props> = ({ postId, onCommentAdded }) => {
     setEmail('');
     setBody('');
     setErrors({ name: '', email: '', body: '' });
-    setIsLoading(false);
+    setHasSubmitted(false);
+  };
+
+  const resetAfterSubmit = () => {
+    setBody('');
+    setErrors({ name: '', email: '', body: '' });
+    setHasSubmitted(false);
   };
 
   return (
@@ -51,20 +58,21 @@ export const NewCommentForm: React.FC<Props> = ({ postId, onCommentAdded }) => {
       onSubmit={async e => {
         e.preventDefault();
         setError(false);
+        setHasSubmitted(true);
         const isValid = validate();
 
         if (isValid) {
           try {
             setIsLoading(true);
             const postData = await client.post<Comment>('/comments', {
-              name,
-              email,
-              body,
+              name: name.trim(),
+              email: email.trim(),
+              body: body.trim(),
               postId,
             });
 
             onCommentAdded(postData);
-            setBody('');
+            resetAfterSubmit();
           } catch {
             setError(true);
           } finally {
@@ -81,7 +89,7 @@ export const NewCommentForm: React.FC<Props> = ({ postId, onCommentAdded }) => {
 
         <div
           className={classNames('control', 'has-icons-left', {
-            'has-icons-right': errors.name,
+            'has-icons-right': hasSubmitted && errors.name,
           })}
         >
           <input
@@ -89,7 +97,9 @@ export const NewCommentForm: React.FC<Props> = ({ postId, onCommentAdded }) => {
             name="name"
             id="comment-author-name"
             placeholder="Name Surname"
-            className={classNames('input', { 'is-danger': errors.name })}
+            className={classNames('input', {
+              'is-danger': hasSubmitted && errors.name,
+            })}
             value={name}
             onChange={e => {
               setName(e.target.value);
@@ -101,7 +111,7 @@ export const NewCommentForm: React.FC<Props> = ({ postId, onCommentAdded }) => {
             <i className="fas fa-user" />
           </span>
 
-          {errors.name && (
+          {hasSubmitted && errors.name && (
             <>
               {' '}
               <span
@@ -114,7 +124,7 @@ export const NewCommentForm: React.FC<Props> = ({ postId, onCommentAdded }) => {
           )}
         </div>
 
-        {errors.name && (
+        {hasSubmitted && errors.name && (
           <p className="help is-danger" data-cy="ErrorMessage">
             {CommentFormError.NameRequired}
           </p>
@@ -128,7 +138,7 @@ export const NewCommentForm: React.FC<Props> = ({ postId, onCommentAdded }) => {
 
         <div
           className={classNames('control', 'has-icons-left', {
-            'has-icons-right': errors.email,
+            'has-icons-right': hasSubmitted && errors.email,
           })}
         >
           <input
@@ -136,7 +146,9 @@ export const NewCommentForm: React.FC<Props> = ({ postId, onCommentAdded }) => {
             name="email"
             id="comment-author-email"
             placeholder="email@test.com"
-            className={classNames('input', { 'is-danger': errors.email })}
+            className={classNames('input', {
+              'is-danger': hasSubmitted && errors.email,
+            })}
             value={email}
             onChange={e => {
               setEmail(e.target.value);
@@ -148,7 +160,7 @@ export const NewCommentForm: React.FC<Props> = ({ postId, onCommentAdded }) => {
             <i className="fas fa-envelope" />
           </span>
 
-          {errors.email && (
+          {hasSubmitted && errors.email && (
             <>
               <span
                 className="icon is-small is-right has-text-danger"
@@ -160,7 +172,7 @@ export const NewCommentForm: React.FC<Props> = ({ postId, onCommentAdded }) => {
           )}
         </div>
 
-        {errors.email && (
+        {hasSubmitted && errors.email && (
           <p className="help is-danger" data-cy="ErrorMessage">
             {CommentFormError.EmailRequired}
           </p>
@@ -177,7 +189,9 @@ export const NewCommentForm: React.FC<Props> = ({ postId, onCommentAdded }) => {
             id="comment-body"
             name="body"
             placeholder="Type comment here"
-            className={classNames('textarea', { 'is-danger': errors.body })}
+            className={classNames('textarea', {
+              'is-danger': hasSubmitted && errors.body,
+            })}
             value={body}
             onChange={e => {
               setBody(e.target.value);
@@ -186,7 +200,7 @@ export const NewCommentForm: React.FC<Props> = ({ postId, onCommentAdded }) => {
           />
         </div>
 
-        {errors.body && (
+        {hasSubmitted && errors.body && (
           <p className="help is-danger" data-cy="ErrorMessage">
             {CommentFormError.TextRequired}
           </p>
@@ -211,6 +225,7 @@ export const NewCommentForm: React.FC<Props> = ({ postId, onCommentAdded }) => {
           </button>
         </div>
       </div>
+
       {error && (
         <div className="notification is-danger" data-cy="ErrorMessage">
           Something went wrong. Please try again.
