@@ -16,10 +16,16 @@ export const PostDetails: React.FC<Props> = ({ post }) => {
   const [showForm, setShowForm] = useState(false);
 
   const deleteComment = (commentId: number) => {
+    const deletedComment = comments.find(c => c.id === commentId);
+
     setComments(currentComments =>
       currentComments.filter(comment => comment.id !== commentId),
     );
     client.delete(`/comments/${commentId}`).catch(() => {
+      if (deletedComment) {
+        setComments(current => [...current, deletedComment]);
+      }
+
       setHasError(true);
     });
   };

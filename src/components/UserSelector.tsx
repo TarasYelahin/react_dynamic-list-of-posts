@@ -32,9 +32,9 @@ export const UserSelector: React.FC<Props> = ({
       }
     };
 
-    document.addEventListener('click', outsideClick);
+    window.addEventListener('click', outsideClick);
 
-    return () => document.removeEventListener('click', outsideClick);
+    return () => window.removeEventListener('click', outsideClick);
   }, []);
 
   return (
@@ -50,7 +50,7 @@ export const UserSelector: React.FC<Props> = ({
           className="button"
           aria-haspopup="true"
           aria-controls="dropdown-menu"
-          onClick={() => setIsDropdownOpen(true)}
+          onClick={() => setIsDropdownOpen(current => !current)}
         >
           <span>
             {users.find(user => user.id === selectedUserId)?.name ||

@@ -20,15 +20,15 @@ export const NewCommentForm: React.FC<Props> = ({ postId, onCommentAdded }) => {
   const validate = () => {
     const newErrors = { name: '', email: '', body: '' };
 
-    if (!name) {
+    if (!name.trim()) {
       newErrors.name = CommentFormError.NameRequired;
     }
 
-    if (!email) {
+    if (!email.trim()) {
       newErrors.email = CommentFormError.EmailRequired;
     }
 
-    if (!body) {
+    if (!body.trim()) {
       newErrors.body = CommentFormError.TextRequired;
     }
 
@@ -91,7 +91,10 @@ export const NewCommentForm: React.FC<Props> = ({ postId, onCommentAdded }) => {
             placeholder="Name Surname"
             className={classNames('input', { 'is-danger': errors.name })}
             value={name}
-            onChange={e => setName(e.target.value)}
+            onChange={e => {
+              setName(e.target.value);
+              setErrors(current => ({ ...current, name: '' }));
+            }}
           />
 
           <span className="icon is-small is-left">
@@ -135,7 +138,10 @@ export const NewCommentForm: React.FC<Props> = ({ postId, onCommentAdded }) => {
             placeholder="email@test.com"
             className={classNames('input', { 'is-danger': errors.email })}
             value={email}
-            onChange={e => setEmail(e.target.value)}
+            onChange={e => {
+              setEmail(e.target.value);
+              setErrors(current => ({ ...current, email: '' }));
+            }}
           />
 
           <span className="icon is-small is-left">
@@ -173,7 +179,10 @@ export const NewCommentForm: React.FC<Props> = ({ postId, onCommentAdded }) => {
             placeholder="Type comment here"
             className={classNames('textarea', { 'is-danger': errors.body })}
             value={body}
-            onChange={e => setBody(e.target.value)}
+            onChange={e => {
+              setBody(e.target.value);
+              setErrors(current => ({ ...current, body: '' }));
+            }}
           />
         </div>
 
